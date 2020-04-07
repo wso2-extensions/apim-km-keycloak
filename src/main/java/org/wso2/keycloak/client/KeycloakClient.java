@@ -530,9 +530,6 @@ public class KeycloakClient extends AbstractKeyManager {
         while(i.hasNext()){
             uris.add((String)i.next());
         }
-//        for(JSONValue value : (JSONArray)responseMap.get(KeycloakConstants.CLIENT_REDIRECT_URIS)){
-//            uris.add(value.asString());
-//        }
         String joinedUris = StringUtils.join(uris, ",");
         String escapedUris = escapeHtml(joinedUris);
         result.setCallBackURL(joinedUris);
@@ -540,16 +537,16 @@ public class KeycloakClient extends AbstractKeyManager {
         result.setIsSaasApplication(false);
         ArrayList<String> grantTypeList = new ArrayList<>();
 
-        if((Boolean) responseMap.get(KeycloakConstants.GRANT_TYPE_IMPLICIT_KEYCLOAK)){
+        if ((Boolean) responseMap.get(KeycloakConstants.GRANT_TYPE_IMPLICIT_KEYCLOAK)) {
             grantTypeList.add(KeycloakConstants.GRANT_TYPE_IMPLICIT);
         }
-        if((Boolean) responseMap.get(KeycloakConstants.GRANT_TYPE_AUTHORIZATION_CODE_KEYCLOAK)){
+        if ((Boolean) responseMap.get(KeycloakConstants.GRANT_TYPE_AUTHORIZATION_CODE_KEYCLOAK)) {
             grantTypeList.add(KeycloakConstants.GRANT_TYPE_AUTHORIZATION_CODE);
         }
-        if((Boolean) responseMap.get(KeycloakConstants.GRANT_TYPE_CLIENT_CREDENTIALS_KEYCLOAK)){
+        if ((Boolean) responseMap.get(KeycloakConstants.GRANT_TYPE_CLIENT_CREDENTIALS_KEYCLOAK)) {
             grantTypeList.add(KeycloakConstants.GRANT_TYPE_CLIENT_CREDENTIALS);
         }
-        if((Boolean) responseMap.get(KeycloakConstants.GRANT_TYPE_PASSWORD_KEYCLOAK)){
+        if ((Boolean) responseMap.get(KeycloakConstants.GRANT_TYPE_PASSWORD_KEYCLOAK)) {
             grantTypeList.add(KeycloakConstants.GRANT_TYPE_PASSWORD);
         }
 
@@ -589,24 +586,24 @@ public class KeycloakClient extends AbstractKeyManager {
         Object clientGrantTypes = oAuthApplicationInfo.getParameter(KeycloakConstants.CLIENT_GRANT_TYPES);
         if (clientGrantTypes != null) {
             List<String> grantTypes = Arrays.asList(((String) clientGrantTypes).split(","));
-            if(grantTypes.contains(KeycloakConstants.GRANT_TYPE_CLIENT_CREDENTIALS)){
+            if (grantTypes.contains(KeycloakConstants.GRANT_TYPE_CLIENT_CREDENTIALS)) {
                 paramMap.put(KeycloakConstants.GRANT_TYPE_CLIENT_CREDENTIALS_KEYCLOAK, true);
-            }else{
+            } else {
                 paramMap.put(KeycloakConstants.GRANT_TYPE_CLIENT_CREDENTIALS_KEYCLOAK, false);
             }
-            if(grantTypes.contains(KeycloakConstants.GRANT_TYPE_AUTHORIZATION_CODE)){
+            if (grantTypes.contains(KeycloakConstants.GRANT_TYPE_AUTHORIZATION_CODE)) {
                 paramMap.put(KeycloakConstants.GRANT_TYPE_AUTHORIZATION_CODE_KEYCLOAK, true);
-            }else{
+            } else {
                 paramMap.put(KeycloakConstants.GRANT_TYPE_AUTHORIZATION_CODE_KEYCLOAK, false);
             }
-            if(grantTypes.contains(KeycloakConstants.GRANT_TYPE_IMPLICIT)){
+            if (grantTypes.contains(KeycloakConstants.GRANT_TYPE_IMPLICIT)) {
                 paramMap.put(KeycloakConstants.GRANT_TYPE_IMPLICIT_KEYCLOAK, true);
-            }else{
+            } else {
                 paramMap.put(KeycloakConstants.GRANT_TYPE_IMPLICIT_KEYCLOAK, false);
             }
-            if(grantTypes.contains(KeycloakConstants.GRANT_TYPE_PASSWORD)){
+            if (grantTypes.contains(KeycloakConstants.GRANT_TYPE_PASSWORD)) {
                 paramMap.put(KeycloakConstants.GRANT_TYPE_PASSWORD_KEYCLOAK, true);
-            }else{
+            } else {
                 paramMap.put(KeycloakConstants.GRANT_TYPE_PASSWORD_KEYCLOAK, false);
             }
         }
