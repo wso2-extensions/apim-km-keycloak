@@ -62,7 +62,7 @@ Then create a new user and grant admin privileges inside the same realm to be ab
 
 ### Step 2: Configure WSO2 API Manager
 
-1. Download latest apim-keymanager-keycloak-x.x.x.jar from [here](https://github.com/wso2-extensions/apim-keymanager-okta/releases).
+1. Download latest apim-keymanager-keycloak-x.x.x.jar from [here](https://github.com/wso2-extensions/apim-keymanager-keycloak/releases).
 2. Copy that JAR file into the `<API-M_HOME>/repository/components/lib` directory.
 3. Uncomment the `<APIKeyManager>` parameter in the `<API-M_HOME>/repository/conf/api-manager.xml` file. 
 Change the values based on your third-party API.
@@ -82,9 +82,10 @@ Change the values based on your third-party API.
        </Configuration>
     </APIKeyManager>
 ```
-4. Comment out the grant types which are not supported by Keycloak by commenting out the ones other than implicit, authorization_code
+4.Comment out the grant types which are not supported by Keycloak by commenting out the ones other than implicit, authorization_code
 client_credentials, password under the SupportedGrantTypes section in the identity.xml file which can be found under 
 <APIM_HOME>/repository/conf/identity directory
+
 ### Step 3: Run the sample
 
 You have connected WSO2 API Manager with a third-party Keycloak IAM server. Let's see how WSO2 API Manager creates OAuth clients in Keycloak, when applications are registered in the API Store.
@@ -136,7 +137,7 @@ You have connected WSO2 API Manager with a third-party Keycloak IAM server. Let'
       
    2. cURL command :
       ```
-      curl -X POST -b cookies https://localhost:9443/store/site/blocks/application/application-update/ajax/application-update.jag -d 'action=updateApplication&applicationOld=keycloakClientApp&applicationNew=keycloakClientAppNew&tier=Unlimited&descriptionNew=&callbackUrlNew=https://httpbin.org/get'
+      curl -k -X POST -b cookies https://localhost:9443/store/site/blocks/application/application-update/ajax/application-update.jag -d 'action=updateApplication&applicationOld=keycloakClientApp&applicationNew=keycloakClientAppNew&tier=Unlimited&descriptionNew=&callbackUrlNew=https://httpbin.org/get'
       ```
       
 6. **Update grant types :**
@@ -197,7 +198,7 @@ You have connected WSO2 API Manager with a third-party Keycloak IAM server. Let'
 
     2. cURL command :
         ```
-        curl -X POST -b cookies https://localhost:9443/store/site/blocks/subscription/subscription-add/ajax/subscription-add.jag -d 'action=mapExistingOauthClient&applicationName=OktaClientApp&keytype=PRODUCTION&callbackUrl=https://www.google.lk&authorizedDomains=ALL&validityTime=3600&client_id=0oadae8nosfopVl7dA0h7&jsonParams={"username":"admin","key_type":"PRODUCTION","client_secret":"bsdsds7-MN0vivfHLO37VyB9M1P19-Ku2qF8OAHH","validityPeriod":"3600", "tokenScope":"test", "tokenGrantType" : "client_credentials"}'
+        curl -k -X POST -b cookies https://localhost:9443/store/site/blocks/subscription/subscription-add/ajax/subscription-add.jag -d 'action=mapExistingOauthClient&applicationName=keycloakClientApp&keytype=PRODUCTION&callbackUrl=https://www.google.lk&authorizedDomains=ALL&validityTime=3600&client_id=admin_keycloakClientApp_PRODUCTION&jsonParams={"username":"admin","key_type":"PRODUCTION","client_secret":"67ca04bb-1131-42ce-805d-58065b530823","validityPeriod":"3600", "tokenScope":"test", "tokenGrantType" : "client_credentials"}'
         ```
     
 9. **Clean partially-created keys :**
@@ -212,17 +213,17 @@ You have connected WSO2 API Manager with a third-party Keycloak IAM server. Let'
     2. cURL command :
     
         ```
-        curl -X POST -b cookies https://localhost:9443/store/site/blocks/subscription/subscription-add/ajax/subscription-add.jag -d 'action=cleanUpApplicationRegistration&applicationName=OktaClientApp&keyType=PRODUCTION'
+        curl -k -X POST -b cookies https://localhost:9443/store/site/blocks/subscription/subscription-add/ajax/subscription-add.jag -d 'action=cleanUpApplicationRegistration&applicationName=keycloakClientAppNew&keyType=PRODUCTION'
         ```
 
-10. **Revoke the token and re-generate the access token from the OAuth Provider :**
+10. **Re-generate the access token from the OAuth Provider :**
     1. Store UI : 
     
         Go to the **Production Keys** tab of the Application. Provide the token scope and click **Regenerate**.
-    
-        >> **Note :** Please make a note of this Consumer Secret and Access Token values, as it will be the only one time that you will be able to view it.
         
         ![alt text](images/regenerate_token.png)
+        
+        >>**Note :** Please note down this token since this token will only be shown once. But you can always generate a new token.
 
     2. cURL command :
         1. Update the token endpoint in the `<API-M_HOME>/repository/deployment/server/synapse-configs/default/api/_TokenAPI_.xml` file accordingly.
