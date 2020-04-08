@@ -100,6 +100,9 @@ You have connected WSO2 API Manager with a third-party Keycloak IAM server. Let'
         ```
         
 3. **Create an application :**
+
+    >>**Note :** Please note that you need to provide the 'Token Type' as 'OAuth' when creating the application.
+
     1. Store UI :
     
        Go to the API Store and click the **Applications tab**. Click **ADD APPLICATION** to create a new application.
@@ -145,7 +148,7 @@ You have connected WSO2 API Manager with a third-party Keycloak IAM server. Let'
     Edit the application details in Keycloak.
     
     1. Store UI: 
-    
+        
         Go to **Production Keys** tab of the Application, fill out the values to be updated and click **Update**.
         ![alt text](images/update_grants.png)
         
@@ -174,34 +177,9 @@ You have connected WSO2 API Manager with a third-party Keycloak IAM server. Let'
         ```
         curl -k -X POST -b cookies https://localhost:9443/store/site/blocks/subscription/subscription-add/ajax/subscription-add.jag -d 'action=deleteAuthApplication&consumerKey=admin_keycloakClientApp_PRODUCTION'
         ```
-        
-8. **Provision an Out-of-Band OAuth Client :** Provision an OAuth client created in the Okta server.
+        ``
     
-    Enable the option to provide out-of-band keys by opening the `<API-M_HOME>/repository/deployment/server/jaggeryapps/store/site/conf/site.json` file and changing the `"mapExistingAuthApps"` setting to `true`.
-
-      > ``"mapExistingAuthApps" : true`
-    
-    1. Store UI : 
-        
-        After creating an application, go to the **Production Keys** tab of the Application.
-    
-         ![alt text](images/map_application.png)
-    
-        Click Provide Keys under Map Existing OAuth Keys.
-        
-         ![alt text](images/map_application_details.png)
-    
-         Fill out the required parameters and click Save. You will be redirected to the page that has application and access token details.
-         
-         >>**Note :** If you have not provide consumer secret, the access token will not be generated.
-         
-
-    2. cURL command :
-        ```
-        curl -k -X POST -b cookies https://localhost:9443/store/site/blocks/subscription/subscription-add/ajax/subscription-add.jag -d 'action=mapExistingOauthClient&applicationName=keycloakClientApp&keytype=PRODUCTION&callbackUrl=https://www.google.lk&authorizedDomains=ALL&validityTime=3600&client_id=admin_keycloakClientApp_PRODUCTION&jsonParams={"username":"admin","key_type":"PRODUCTION","client_secret":"67ca04bb-1131-42ce-805d-58065b530823","validityPeriod":"3600", "tokenScope":"test", "tokenGrantType" : "client_credentials"}'
-        ```
-    
-9. **Clean partially-created keys :**
+8. **Clean partially-created keys :**
 
     Clean any partially-created keys from the API Manager database, before adding a new subscription. Partially-created keys can remain in the API Manager databases when an OAuth application of a third-party Keycloak server gets deleted through the API Store UI. It only deletes the mapping that is maintained within API Manager.
 
@@ -216,7 +194,7 @@ You have connected WSO2 API Manager with a third-party Keycloak IAM server. Let'
         curl -k -X POST -b cookies https://localhost:9443/store/site/blocks/subscription/subscription-add/ajax/subscription-add.jag -d 'action=cleanUpApplicationRegistration&applicationName=keycloakClientAppNew&keyType=PRODUCTION'
         ```
 
-10. **Re-generate the access token from the OAuth Provider :**
+9. **Re-generate the access token from the OAuth Provider :**
     1. Store UI : 
     
         Go to the **Production Keys** tab of the Application. Provide the token scope and click **Regenerate**.
@@ -236,7 +214,7 @@ You have connected WSO2 API Manager with a third-party Keycloak IAM server. Let'
               curl -k -d "grant_type=client_credentials&scope=test" -H "Authorization: Basic <ConsumerKey:ConsumerSecret>" -H "Content-Type: application/x-www-form-urlencoded" https://localhost:8243/token
               ```
               
-11. **Validate tokens by subscribing to the Keycloak client :**
+10. **Validate tokens by subscribing to the Keycloak client :**
     1. Sign in to the API Publisher and deploy the sample API (PizzaShackAPI), if you haven't done so already : 
         
         ![alt text](images/deploy_api.png)
