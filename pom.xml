@@ -111,9 +111,9 @@
         </snapshotRepository>
     </distributionManagement>
     <!--scm>
-        <connection>scm:git:https://github.com/wso2-extensions/apim-keymanager-okta.git</connection>
-        <url>https://github.com/wso2-extensions/apim-keymanager-okta.git</url>
-        <developerConnection>scm:git:https://github.com/wso2-extensions/apim-keymanager-okta</developerConnection>
+        <connection>scm:git:https://github.com/wso2-extensions/apim-keymanager-keycloak.git</connection>
+        <url>https://github.com/wso2-extensions/apim-keymanager-keycloak.git</url>
+        <developerConnection>scm:git:https://github.com/wso2-extensions/apim-keymanager-keycloak</developerConnection>
         <tag>HEAD</tag>
     </scm-->
     <build>
