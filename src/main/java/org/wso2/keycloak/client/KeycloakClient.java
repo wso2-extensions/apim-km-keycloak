@@ -537,6 +537,7 @@ public class KeycloakClient extends AbstractKeyManager {
         result.addParameter(KeycloakConstants.CLIENT_GRANT_TYPES, StringUtils.join(grantTypeList, " "));
         result.addParameter(KeycloakConstants.CALLBACK_URL, escapedUris);
         result.addParameter(KeycloakConstants.REDIRECT_URIS, escapedUris);
+        result.addParameter(KeycloakConstants.CLIENT_NAME, responseMap.get(KeycloakConstants.CLIENT_ID));
 
         return result;
     }
@@ -880,5 +881,33 @@ public class KeycloakClient extends AbstractKeyManager {
         tokenInfo.setTokenState(KeycloakConstants.ACCESS_TOKEN_ACTIVE);
 
         return tokenInfo;
+    }
+    
+    /**
+     * method to update application owner (change ownership from admin portal :
+     * supported from 2.6)
+     * 
+     * @param oAuthAppRequest Parameters to be passed to Authorization Server,
+     *                        encapsulated as an {@code OAuthAppRequest}
+     * @param owner
+     * @return Details of updated OAuth Client
+     * @throws APIManagementException This is the custom exception class for API
+     *                                management
+     */
+    public OAuthApplicationInfo updateApplicationOwner(OAuthAppRequest oAuthAppRequest, String owner)
+            throws APIManagementException {
+        OAuthApplicationInfo oAuthApplicationInfo = oAuthAppRequest.getOAuthApplicationInfo();
+        String clientId = oAuthApplicationInfo.getClientId();
+        if (log.isDebugEnabled()) {
+            log.debug(String.format("Updating application owner for the Consumer Key: %s", clientId));
+        }
+
+        try {
+            return updateApplication(oAuthAppRequest);
+        } catch (Exception e) {
+            handleException("Error occurred while updating OAuth application owner to " + owner, e);
+        }
+
+        return null;
     }
 }
