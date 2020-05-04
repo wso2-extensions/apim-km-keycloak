@@ -566,7 +566,7 @@ public class KeycloakClient extends AbstractKeyManager {
         }
 
         String clientRedirectUri = oAuthApplicationInfo.getCallBackURL();
-        if (!StringUtils.isNotEmpty(clientRedirectUri)) {
+        if (StringUtils.isNotEmpty(clientRedirectUri)) {
             List<String> redirectUris = Collections.singletonList(clientRedirectUri);
             paramMap.put(KeycloakConstants.CLIENT_REDIRECT_URIS, redirectUris);
         }
