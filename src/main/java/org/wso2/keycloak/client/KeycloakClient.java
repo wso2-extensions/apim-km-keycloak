@@ -521,23 +521,23 @@ public class KeycloakClient extends AbstractKeyManager {
         result.setIsSaasApplication(false);
         ArrayList<String> grantTypeList = new ArrayList<>();
 
-        if ((Boolean) responseMap.get(KeycloakConstants.GRANT_TYPE_IMPLICIT_KEYCLOAK)) {
+        if (Boolean.TRUE.equals(responseMap.get(KeycloakConstants.GRANT_TYPE_IMPLICIT_KEYCLOAK))) {
             grantTypeList.add(KeycloakConstants.GRANT_TYPE_IMPLICIT);
         }
-        if ((Boolean) responseMap.get(KeycloakConstants.GRANT_TYPE_AUTHORIZATION_CODE_KEYCLOAK)) {
+        if (Boolean.TRUE.equals(responseMap.get(KeycloakConstants.GRANT_TYPE_AUTHORIZATION_CODE_KEYCLOAK))) {
             grantTypeList.add(KeycloakConstants.GRANT_TYPE_AUTHORIZATION_CODE);
         }
-        if ((Boolean) responseMap.get(KeycloakConstants.GRANT_TYPE_CLIENT_CREDENTIALS_KEYCLOAK)) {
+        if (Boolean.TRUE.equals(responseMap.get(KeycloakConstants.GRANT_TYPE_CLIENT_CREDENTIALS_KEYCLOAK))) {
             grantTypeList.add(KeycloakConstants.GRANT_TYPE_CLIENT_CREDENTIALS);
         }
-        if ((Boolean) responseMap.get(KeycloakConstants.GRANT_TYPE_PASSWORD_KEYCLOAK)) {
+        if (Boolean.TRUE.equals(responseMap.get(KeycloakConstants.GRANT_TYPE_PASSWORD_KEYCLOAK))) {
             grantTypeList.add(KeycloakConstants.GRANT_TYPE_PASSWORD);
         }
 
         result.addParameter(KeycloakConstants.CLIENT_GRANT_TYPES, StringUtils.join(grantTypeList, " "));
         result.addParameter(KeycloakConstants.CALLBACK_URL, escapedUris);
         result.addParameter(KeycloakConstants.REDIRECT_URIS, escapedUris);
-        result.addParameter(KeycloakConstants.CLIENT_NAME, responseMap.get(KeycloakConstants.CLIENT_ID));
+        result.addParameter(KeycloakConstants.CLIENT_NAME, responseMap.get(KeycloakConstants.KEYCLOAK_CLIENT_ID));
 
         return result;
     }
