@@ -18,10 +18,7 @@
 
 package org.wso2.keycloak.client;
 
-import com.nimbusds.jose.JWSHeader;
-import com.nimbusds.jose.Payload;
 import com.nimbusds.jwt.*;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -41,20 +38,19 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.api.model.*;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.AbstractKeyManager;
-import org.wso2.carbon.apimgt.impl.factory.KeyManagerHolder;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import static org.apache.commons.lang.StringEscapeUtils.escapeHtml;
@@ -102,7 +98,7 @@ public class KeycloakClient extends AbstractKeyManager {
                 KeycloakConstants.CLIENT_ENDPOINT;
         String[] scope = ((String) oAuthApplicationInfo.getParameter(KeycloakConstants.TOKEN_SCOPE)).split(",");
         Object tokenGrantType = oAuthApplicationInfo.getParameter(KeycloakConstants.TOKEN_GRANT_TYPE);
-        Map<String, Object> paramMap = new HashMap<String, Object>();
+        Map<String, Object> paramMap = new HashMap<>();
         try (CloseableHttpClient httpClient = HttpClientBuilder.create().build();) {
             // Create the JSON Payload that should be sent to OAuth Server.
             String jsonPayload = createJsonPayloadFromOauthApplication(oAuthApplicationInfo, paramMap);
@@ -112,7 +108,7 @@ public class KeycloakClient extends AbstractKeyManager {
                         clientName));
             }
             HttpPost httpPost = new HttpPost(registrationEndpoint);
-            httpPost.setEntity(new StringEntity(jsonPayload, KeycloakConstants.UTF_8));
+            httpPost.setEntity(new StringEntity(jsonPayload, StandardCharsets.UTF_8));
             httpPost.setHeader(KeycloakConstants.HTTP_HEADER_CONTENT_TYPE, KeycloakConstants.APPLICATION_JSON);
             httpPost.setHeader(KeycloakConstants.AUTHORIZATION, KeycloakConstants.AUTHENTICATION_BEARER + accessToken);
 
@@ -160,7 +156,7 @@ public class KeycloakClient extends AbstractKeyManager {
         String registrationEndpoint = keyCloakInstanceUrl + KeycloakConstants.KEYCLOAK_ADMIN_CONTEXT + keycloakRealm +
                 KeycloakConstants.CLIENT_ENDPOINT + clientId;
 
-        Map<String, Object> paramMap = new HashMap<String, Object>();
+        Map<String, Object> paramMap = new HashMap<>();
         if (StringUtils.isNotEmpty(clientId)) {
             paramMap.put(KeycloakConstants.KEYCLOAK_CLIENT_ID, clientId);
         }
@@ -172,7 +168,7 @@ public class KeycloakClient extends AbstractKeyManager {
                         clientId));
             }
             HttpPut httpPut = new HttpPut(registrationEndpoint);
-            httpPut.setEntity(new StringEntity(jsonPayload, KeycloakConstants.UTF_8));
+            httpPut.setEntity(new StringEntity(jsonPayload, StandardCharsets.UTF_8));
             httpPut.setHeader(KeycloakConstants.HTTP_HEADER_CONTENT_TYPE, KeycloakConstants.APPLICATION_JSON);
             String accessToken = getAccessToken();
             httpPut.setHeader(KeycloakConstants.AUTHORIZATION, KeycloakConstants.AUTHENTICATION_BEARER + accessToken);
@@ -254,7 +250,7 @@ public class KeycloakClient extends AbstractKeyManager {
             log.debug(String.format("Get new client access token from authorization server for the Consumer Key %s",
                     clientId));
         }
-        List<NameValuePair> parameters = new ArrayList<NameValuePair>();
+        List<NameValuePair> parameters = new ArrayList<>();
         Object grantType = accessTokenRequest.getGrantType();
         if (grantType == null) {
             grantType = KeycloakConstants.GRANT_TYPE_CLIENT_CREDENTIALS;
@@ -309,7 +305,7 @@ public class KeycloakClient extends AbstractKeyManager {
         String introspectEndpoint = keyCloakInstanceUrl + KeycloakConstants.KEYCLOAK_TOKEN_CONTEXT + keycloakRealm +
                 KeycloakConstants.KEYCLOAK_INTROSPECT_PATH;
         try (CloseableHttpClient httpClient = HttpClientBuilder.create().build();) {
-            List<NameValuePair> parameters = new ArrayList<NameValuePair>();
+            List<NameValuePair> parameters = new ArrayList<>();
             parameters.add(new BasicNameValuePair(KeycloakConstants.TOKEN, accessToken));
             parameters.add(new BasicNameValuePair(KeycloakConstants.CLIENT_ID, clientId));
             parameters.add(new BasicNameValuePair(KeycloakConstants.CLIENT_SECRET, clientSecret));
@@ -326,7 +322,7 @@ public class KeycloakClient extends AbstractKeyManager {
                             KeycloakConstants.ERROR_COULD_NOT_READ_HTTP_ENTITY, response));
                 }
 
-                try (BufferedReader reader = new BufferedReader(new InputStreamReader(entity.getContent(), KeycloakConstants.UTF_8));) {
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(entity.getContent(), StandardCharsets.UTF_8));) {
                     responseJSON = getParsedObjectByReader(reader);
                 }
                 if (responseJSON == null) {
@@ -481,12 +477,12 @@ public class KeycloakClient extends AbstractKeyManager {
 
     @Override
     public void deleteRegisteredResourceByAPIId(String s) throws APIManagementException {
-
+        // not implemented
     }
 
     @Override
     public void deleteMappedApplication(String s) throws APIManagementException {
-
+        // not implemented
     }
 
     @Override
@@ -553,7 +549,7 @@ public class KeycloakClient extends AbstractKeyManager {
      * @throws APIManagementException This is the custom exception class for API management.
      */
     private String createJsonPayloadFromOauthApplication(OAuthApplicationInfo oAuthApplicationInfo,
-                                                         Map<String, Object> paramMap) throws APIManagementException {
+                                                         Map<String, Object> paramMap) {
         String clientId = oAuthApplicationInfo.getClientId();
         if (log.isDebugEnabled()) {
             log.debug(String.format("Creating json payload from Oauth application info for the application: %s",
@@ -640,14 +636,10 @@ public class KeycloakClient extends AbstractKeyManager {
      * @param clientSecret clientSecret of the oauth clients.
      * @return String base64 encode string.
      */
-    private static String getEncodedCredentials(String clientId, String clientSecret) throws APIManagementException {
+    private static String getEncodedCredentials(String clientId, String clientSecret) {
         String encodedCredentials;
-        try {
-            encodedCredentials = Base64.getEncoder().encodeToString((clientId + ":" + clientSecret)
-                    .getBytes(KeycloakConstants.UTF_8));
-        } catch (UnsupportedEncodingException e) {
-            throw new APIManagementException(KeycloakConstants.ERROR_ENCODING_METHOD_NOT_SUPPORTED, e);
-        }
+        encodedCredentials = Base64.getEncoder()
+                .encodeToString((clientId + ":" + clientSecret).getBytes(StandardCharsets.UTF_8));
 
         return encodedCredentials;
     }
@@ -689,16 +681,16 @@ public class KeycloakClient extends AbstractKeyManager {
         String keycloakInstanceUrl = configuration.getParameter(KeycloakConstants.KEYCLOAK_INSTANCE_URL);
         String username = configuration.getParameter(KeycloakConstants.USERNAME);
         String password = configuration.getParameter(KeycloakConstants.PASSWORD);
-        String client_id = configuration.getParameter(KeycloakConstants.CLIENT_ID);
+        String clientId = configuration.getParameter(KeycloakConstants.CLIENT_ID);
         String keycloakRealm = configuration.getParameter(KeycloakConstants.KEYCLOAK_REALM_NAME);
         String keyCloakTokenEndpoint = keycloakInstanceUrl + KeycloakConstants.KEYCLOAK_TOKEN_CONTEXT + keycloakRealm +
                 KeycloakConstants.KEYCLOAK_TOKEN_PATH;
 
         try (CloseableHttpClient httpClient = HttpClientBuilder.create().build();) {
-            List<NameValuePair> parameters = new ArrayList<NameValuePair>();
+            List<NameValuePair> parameters = new ArrayList<>();
             parameters.add(new BasicNameValuePair(KeycloakConstants.USERNAME, username));
             parameters.add(new BasicNameValuePair(KeycloakConstants.PASSWORD, password));
-            parameters.add(new BasicNameValuePair(KeycloakConstants.CLIENT_ID, client_id));
+            parameters.add(new BasicNameValuePair(KeycloakConstants.CLIENT_ID, clientId));
             if(keycloakTokenInfo != null && keycloakTokenInfo.isRefreshValid()){
                 parameters.add(new BasicNameValuePair(KeycloakConstants.GRANT_TYPE,
                         KeycloakConstants.GRANT_TYPE_REFRESH_TOKEN));
@@ -714,7 +706,7 @@ public class KeycloakClient extends AbstractKeyManager {
             int statusCode = response.getStatusLine().getStatusCode();
             if (HttpStatus.SC_OK == statusCode) {
                 HttpEntity entity = response.getEntity();
-                try (BufferedReader reader = new BufferedReader(new InputStreamReader(entity.getContent(), KeycloakConstants.UTF_8));) {
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(entity.getContent(), StandardCharsets.UTF_8));) {
                     JSONObject responseJSON = getParsedObjectByReader(reader);
                     keycloakTokenInfo = new KeycloakTokenInfo((String) responseJSON.get(KeycloakConstants.ACCESS_TOKEN),
                             (String) responseJSON.get(KeycloakConstants.REFRESH_TOKEN),
@@ -761,9 +753,8 @@ public class KeycloakClient extends AbstractKeyManager {
             int statusCode = response.getStatusLine().getStatusCode();
             if (HttpStatus.SC_OK == statusCode) {
                 HttpEntity entity = response.getEntity();
-                try (BufferedReader reader = new BufferedReader(new InputStreamReader(entity.getContent(), KeycloakConstants.UTF_8));) {
-                    JSONObject responseJSON = getParsedObjectByReader(reader);
-                    return responseJSON;
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(entity.getContent(), StandardCharsets.UTF_8));) {
+                    return getParsedObjectByReader(reader);
                 }
             }else{
                 handleException("Error occurred while generating access token");
@@ -800,7 +791,7 @@ public class KeycloakClient extends AbstractKeyManager {
             int statusCode = response.getStatusLine().getStatusCode();
             if (HttpStatus.SC_OK == statusCode) {
                 HttpEntity entity = response.getEntity();
-                try (BufferedReader reader = new BufferedReader(new InputStreamReader(entity.getContent(), KeycloakConstants.UTF_8));) {
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(entity.getContent(), StandardCharsets.UTF_8));) {
                     JSONObject responseJSON = getParsedObjectByReader(reader);
                     return (String) responseJSON.get(KeycloakConstants.CLIENT_SECRET_VALUE);
                 }
@@ -836,9 +827,8 @@ public class KeycloakClient extends AbstractKeyManager {
             int statusCode = response.getStatusLine().getStatusCode();
             if (HttpStatus.SC_OK == statusCode) {
                 HttpEntity entity = response.getEntity();
-                try (BufferedReader reader = new BufferedReader(new InputStreamReader(entity.getContent(), KeycloakConstants.UTF_8));) {
-                    JSONObject responseJSON = getParsedObjectByReader(reader);
-                    return responseJSON;
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(entity.getContent(), StandardCharsets.UTF_8));) {
+                    return getParsedObjectByReader(reader);
                 }
             }
         } catch (ParseException e) {
