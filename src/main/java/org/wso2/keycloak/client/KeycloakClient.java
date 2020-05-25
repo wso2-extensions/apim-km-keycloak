@@ -125,7 +125,8 @@ public class KeycloakClient extends AbstractKeyManager {
 
             // If successful a 201 will be returned with no body
             if (HttpStatus.SC_CREATED == statusCode) {
-                String clientSecret = getClientSecret(clientName);
+            	 String keycloakId = getKeycloakId(clientName);
+                String clientSecret = getClientSecret(keycloakId);
                 JSONObject clientInfoJsonObject = getClientById(clientName);
                 oAuthApplicationInfo = createOAuthAppInfoFromResponse(clientInfoJsonObject);
                 oAuthApplicationInfo.addParameter(KeycloakConstants.TOKEN_SCOPE, scope);
@@ -154,11 +155,13 @@ public class KeycloakClient extends AbstractKeyManager {
             log.debug(String.format("Updating an OAuth client in Keycloak authorization server for the Consumer Key %s",
                     clientId));
         }
+        // Get Keycloak Id
+        String keycloakId = getKeycloakId(clientId);
         // Getting Client Instance Url and API Key from Config.
         String keyCloakInstanceUrl = configuration.getParameter(KeycloakConstants.KEYCLOAK_INSTANCE_URL);
         String keycloakRealm = configuration.getParameter(KeycloakConstants.KEYCLOAK_REALM_NAME);
         String registrationEndpoint = keyCloakInstanceUrl + KeycloakConstants.KEYCLOAK_ADMIN_CONTEXT + keycloakRealm +
-                KeycloakConstants.CLIENT_ENDPOINT + clientId;
+                KeycloakConstants.CLIENT_ENDPOINT + keycloakId;
 
         Map<String, Object> paramMap = new HashMap<String, Object>();
         if (StringUtils.isNotEmpty(clientId)) {
@@ -182,7 +185,7 @@ public class KeycloakClient extends AbstractKeyManager {
             HttpResponse response = httpClient.execute(httpPut);
             int statusCode = response.getStatusLine().getStatusCode();
             if (statusCode == HttpStatus.SC_NO_CONTENT){
-                String clientSecret = getClientSecret(clientId);
+                String clientSecret = getClientSecret(keycloakId);
                 JSONObject clientInfoJsonObject = getClientById(clientId);
                 oAuthApplicationInfo = createOAuthAppInfoFromResponse(clientInfoJsonObject);
                 oAuthApplicationInfo.addParameter(KeycloakConstants.CLIENT_SECRET, clientSecret);
@@ -207,10 +210,11 @@ public class KeycloakClient extends AbstractKeyManager {
                     clientId));
         }
         // Getting Client Instance Url and API Key from Config.
+        String keycloakId = getKeycloakId(clientId);
         String keyCloakInstanceUrl = configuration.getParameter(KeycloakConstants.KEYCLOAK_INSTANCE_URL);
         String keycloakRealm = configuration.getParameter(KeycloakConstants.KEYCLOAK_REALM_NAME);
         String registrationEndpoint = keyCloakInstanceUrl + KeycloakConstants.KEYCLOAK_ADMIN_CONTEXT + keycloakRealm +
-                KeycloakConstants.CLIENT_ENDPOINT + clientId;
+                KeycloakConstants.CLIENT_ENDPOINT + keycloakId;
 
         String accessToken = getAccessToken();
         try (CloseableHttpClient httpClient = HttpClientBuilder.create().build();) {
@@ -238,7 +242,8 @@ public class KeycloakClient extends AbstractKeyManager {
     @Override
     public OAuthApplicationInfo retrieveApplication(String clientId) throws APIManagementException {
         OAuthApplicationInfo oAuthApplicationInfo;
-        String clientSecret = getClientSecret(clientId);
+        String keycloakId = getKeycloakId(clientId);
+        String clientSecret = getClientSecret(keycloakId);
         JSONObject clientInfoJsonObject = getClientById(clientId);
         oAuthApplicationInfo = createOAuthAppInfoFromResponse(clientInfoJsonObject);
         oAuthApplicationInfo.setClientSecret(clientSecret);
@@ -302,7 +307,8 @@ public class KeycloakClient extends AbstractKeyManager {
             }
             handleException("Invalid JWT token. Failed to decode the token.");
         }
-        String clientSecret = getClientSecret(clientId);
+        String keycloakId = getKeycloakId(clientId);
+        String clientSecret = getClientSecret(keycloakId);
         AccessTokenInfo tokenInfo = new AccessTokenInfo();
         String keyCloakInstanceUrl = configuration.getParameter(KeycloakConstants.KEYCLOAK_INSTANCE_URL);
         String keycloakRealm = configuration.getParameter(KeycloakConstants.KEYCLOAK_REALM_NAME);
@@ -562,7 +568,7 @@ public class KeycloakClient extends AbstractKeyManager {
 
         if (StringUtils.isNotEmpty(clientId)) {
             paramMap.put(KeycloakConstants.KEYCLOAK_CLIENT_ID, clientId);
-            paramMap.put(KeycloakConstants.KEYCLOAK_ID, clientId);
+            //paramMap.put(KeycloakConstants.KEYCLOAK_ID, clientId);
         }
 
         String clientRedirectUri = oAuthApplicationInfo.getCallBackURL();
@@ -628,7 +634,15 @@ public class KeycloakClient extends AbstractKeyManager {
         JSONObject parsedObject = null;
         JSONParser parser = new JSONParser();
         if (reader != null) {
-            parsedObject = (JSONObject) parser.parse(reader);
+        	Object object = parser.parse(reader);
+        	
+        	if(object instanceof JSONArray) {
+        		JSONArray jsonArray = (JSONArray) object;
+        		parsedObject = (JSONObject)jsonArray.get(0);
+        	} else {
+        		parsedObject = (JSONObject)object;
+        	}
+           
         }
         return parsedObject;
     }
@@ -816,7 +830,43 @@ public class KeycloakClient extends AbstractKeyManager {
         }
         return null;
     }
-
+    
+    /**
+     * This method returns the Keycloak id with the given clientId in Keycloak
+     * @param clientId Client id of a client in Keycloak
+     * @return Keycloak id
+     * @throws APIManagementException This is the custom exception class for API management
+     */
+    private String getKeycloakId(String clientId) throws APIManagementException{
+        String accessToken = getAccessToken();
+        String keyCloakInstanceUrl = configuration.getParameter(KeycloakConstants.KEYCLOAK_INSTANCE_URL);
+        String keycloakRealm = configuration.getParameter(KeycloakConstants.KEYCLOAK_REALM_NAME);
+        String clientSecretEndpoint = keyCloakInstanceUrl + KeycloakConstants.KEYCLOAK_ADMIN_CONTEXT + keycloakRealm +
+                KeycloakConstants.CLIENT_ENDPOINT + "?clientId=" + clientId;
+        try (CloseableHttpClient httpClient = HttpClientBuilder.create().build();) {
+            HttpGet httpGet = new HttpGet(clientSecretEndpoint);
+            httpGet.setHeader(KeycloakConstants.AUTHORIZATION, KeycloakConstants.AUTHENTICATION_BEARER + accessToken);
+            HttpResponse response = httpClient.execute(httpGet);
+            int statusCode = response.getStatusLine().getStatusCode();
+            if (HttpStatus.SC_OK == statusCode) {
+                HttpEntity entity = response.getEntity();
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(entity.getContent(), KeycloakConstants.UTF_8));) {
+                    JSONObject responseJSON = getParsedObjectByReader(reader);
+                    return (String)responseJSON.get(KeycloakConstants.KEYCLOAK_ID);
+                }
+            }
+        } catch (ParseException e) {
+            handleException(KeycloakConstants.ERROR_WHILE_PARSE_RESPONSE, e);
+        } catch (UnsupportedEncodingException e) {
+            handleException(KeycloakConstants.ERROR_ENCODING_METHOD_NOT_SUPPORTED, e);
+        } catch (ClientProtocolException e) {
+            handleException("HTTP request error has occurred while sending request to OAuth provider. ", e);
+        } catch (IOException e) {
+            handleException(KeycloakConstants.ERROR_OCCURRED_WHILE_READ_OR_CLOSE_BUFFER_READER, e);
+        }
+        return null;
+    }
+    
     /**
      * This method returns the client representation related of a client with the given clientId in Keycloak
      * @param clientId Client id of a client in Keycloak
@@ -828,7 +878,7 @@ public class KeycloakClient extends AbstractKeyManager {
         String keyCloakInstanceUrl = configuration.getParameter(KeycloakConstants.KEYCLOAK_INSTANCE_URL);
         String keycloakRealm = configuration.getParameter(KeycloakConstants.KEYCLOAK_REALM_NAME);
         String clientSecretEndpoint = keyCloakInstanceUrl + KeycloakConstants.KEYCLOAK_ADMIN_CONTEXT + keycloakRealm +
-                KeycloakConstants.CLIENT_ENDPOINT + clientId;
+                KeycloakConstants.CLIENT_ENDPOINT + "?clientId=" + clientId;
         try (CloseableHttpClient httpClient = HttpClientBuilder.create().build();) {
             HttpGet httpGet = new HttpGet(clientSecretEndpoint);
             httpGet.setHeader(KeycloakConstants.AUTHORIZATION, KeycloakConstants.AUTHENTICATION_BEARER + accessToken);
