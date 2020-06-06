@@ -543,7 +543,7 @@ public class KeycloakClient extends AbstractKeyManager {
         result.addParameter(KeycloakConstants.CLIENT_GRANT_TYPES, StringUtils.join(grantTypeList, " "));
         result.addParameter(KeycloakConstants.CALLBACK_URL, escapedUris);
         result.addParameter(KeycloakConstants.REDIRECT_URIS, escapedUris);
-        result.addParameter(KeycloakConstants.CLIENT_NAME, responseMap.get(KeycloakConstants.CLIENT_ID));
+        result.addParameter(KeycloakConstants.CLIENT_NAME, responseMap.get(KeycloakConstants.KEYCLOAK_CLIENT_ID));
 
         return result;
     }
