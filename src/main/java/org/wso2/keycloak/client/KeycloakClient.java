@@ -48,6 +48,7 @@ import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.api.model.*;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.AbstractKeyManager;
+import org.wso2.carbon.apimgt.impl.dao.ApiMgtDAO;
 import org.wso2.carbon.apimgt.impl.factory.KeyManagerHolder;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
@@ -487,12 +488,12 @@ public class KeycloakClient extends AbstractKeyManager {
 
     @Override
     public void deleteRegisteredResourceByAPIId(String s) throws APIManagementException {
-
+        // method not implemented
     }
 
     @Override
     public void deleteMappedApplication(String s) throws APIManagementException {
-
+        // method not implemented
     }
 
     @Override
@@ -543,7 +544,7 @@ public class KeycloakClient extends AbstractKeyManager {
         result.addParameter(KeycloakConstants.CLIENT_GRANT_TYPES, StringUtils.join(grantTypeList, " "));
         result.addParameter(KeycloakConstants.CALLBACK_URL, escapedUris);
         result.addParameter(KeycloakConstants.REDIRECT_URIS, escapedUris);
-        result.addParameter(KeycloakConstants.CLIENT_NAME, responseMap.get(KeycloakConstants.CLIENT_ID));
+        result.addParameter(KeycloakConstants.CLIENT_NAME, responseMap.get(KeycloakConstants.KEYCLOAK_CLIENT_ID));
 
         return result;
     }
@@ -676,18 +677,6 @@ public class KeycloakClient extends AbstractKeyManager {
     private static void handleException(String msg) throws APIManagementException {
         log.error(msg);
         throw new APIManagementException(msg);
-    }
-
-    /**
-     * Common method to throw exceptions.
-     *
-     * @param msg this parameter contain error message that we need to throw.
-     * @param e   Exception object.
-     * @throws APIManagementException This is the custom exception class for API management
-     */
-    private static void handleException(String msg, Exception e) throws APIManagementException {
-        log.error(msg, e);
-        throw new APIManagementException(msg, e);
     }
 
     /**
@@ -962,5 +951,18 @@ public class KeycloakClient extends AbstractKeyManager {
         }
 
         return null;
+    }
+
+    @Override
+    public String getNewApplicationConsumerSecret(AccessTokenRequest arg0) throws APIManagementException {
+        log.warn("Consumer key updating is not supported");
+        return null;
+    }
+
+    @Override
+    public Map<String, Set<Scope>> getScopesForAPIS(String apiIdsString) throws APIManagementException {
+        log.debug("Invoking getScopesForAPIS() method for apiId " + apiIdsString);
+        ApiMgtDAO apiMgtDAO = ApiMgtDAO.getInstance();
+        return apiMgtDAO.getScopesForAPIS(apiIdsString);
     }
 }
