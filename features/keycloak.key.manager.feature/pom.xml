@@ -15,7 +15,7 @@
     <dependencies>
         <dependency>
             <groupId>org.wso2.km.ext.keycloak</groupId>
-            <artifactId>keycloack.key.manager</artifactId>
+            <artifactId>keycloak.key.manager</artifactId>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
