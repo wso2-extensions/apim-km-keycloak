@@ -648,16 +648,23 @@ public class KeycloakClient extends AbstractKeyManager {
         if (additionalProperties.containsKey(KeycloakConstants.CLIENT_SECRET)) {
             clientInfo.setClientSecret((String) additionalProperties.get(KeycloakConstants.CLIENT_SECRET));
         }
-        if (additionalProperties.containsKey(KeycloakConstants.CLIENT_RESPONSE_TYPES)) {
-            clientInfo.setResponseTypes((List) additionalProperties.get(KeycloakConstants.CLIENT_RESPONSE_TYPES));
+        if (additionalProperties.get(KeycloakConstants.CLIENT_RESPONSE_TYPES) instanceof List) {
+            clientInfo
+                    .setResponseTypes((List<String>) additionalProperties.get(KeycloakConstants.CLIENT_RESPONSE_TYPES));
         }
         if (additionalProperties.containsKey(KeycloakConstants.CLIENT_TOKEN_ENDPOINT_AUTH_METHOD)) {
             clientInfo.setTokenEndpointAuthenticationMethod(
                     (String) additionalProperties.get(KeycloakConstants.CLIENT_TOKEN_ENDPOINT_AUTH_METHOD));
         }
         if (additionalProperties.containsKey(KeycloakConstants.TLS_CLIENT_CERTIFICATE_BOUND_ACCESS_TOKEN)) {
-            clientInfo.setEnableClientCertificateBindAccessToken(Boolean.parseBoolean(
-                    (String) additionalProperties.get(KeycloakConstants.TLS_CLIENT_CERTIFICATE_BOUND_ACCESS_TOKEN)));
+            Object clientBoundAccessToken =
+                    additionalProperties.get(KeycloakConstants.TLS_CLIENT_CERTIFICATE_BOUND_ACCESS_TOKEN);
+            if (clientBoundAccessToken instanceof Boolean) {
+                clientInfo.setEnableClientCertificateBindAccessToken((Boolean) clientBoundAccessToken);
+            } else if (clientBoundAccessToken instanceof String) {
+                clientInfo.setEnableClientCertificateBindAccessToken(
+                        Boolean.parseBoolean((String) clientBoundAccessToken));
+            }
         }
         return clientInfo;
     }
