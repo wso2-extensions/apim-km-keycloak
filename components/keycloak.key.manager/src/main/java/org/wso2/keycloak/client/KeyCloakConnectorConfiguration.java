@@ -15,8 +15,7 @@ import java.util.List;
 @Component(
         name = "keycloak.configuration.component",
         immediate = true,
-        service = KeyManagerConnectorConfiguration.class,
-        property = {"type=" + KeycloakConstants.KEY_CLOAK_TYPE}
+        service = KeyManagerConnectorConfiguration.class
 )
 public class KeyCloakConnectorConfiguration implements KeyManagerConnectorConfiguration {
 
@@ -68,5 +67,11 @@ public class KeyCloakConnectorConfiguration implements KeyManagerConnectorConfig
                         "select", "Generate Certificate Bound Oauth2 Token", "false", true,
                         false, Arrays.asList("false", "true"), false));
         return configurationDtoList;
+    }
+
+    @Override
+    public String getType() {
+
+        return KeycloakConstants.KEY_CLOAK_TYPE;
     }
 }
