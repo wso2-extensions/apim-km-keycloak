@@ -79,7 +79,6 @@ import java.util.Set;
 public class KeycloakClient extends AbstractKeyManager {
 
     private static final Log log = LogFactory.getLog(KeycloakClient.class);
-    private KeyManagerConfiguration configuration;
     private DCRClient dcrClient;
     private IntrospectionClient introspectionClient;
 
@@ -241,7 +240,9 @@ public class KeycloakClient extends AbstractKeyManager {
             tokenInfo.setValidityPeriod(introspectInfo.getExpiryTime() - introspectInfo.getIssuedAt());
             tokenInfo.setEndUserName(introspectInfo.getUsername());
             tokenInfo.setConsumerKey(introspectInfo.getConsumerKey());
-            tokenInfo.setScope(introspectInfo.getScope().split("\\s+"));
+            if (StringUtils.isNotEmpty(introspectInfo.getScope())) {
+                tokenInfo.setScope(introspectInfo.getScope().split("\\s+"));
+            }
             tokenInfo.addParameter(KeycloakConstants.ACCESS_TOKEN_ISSUER, introspectInfo.getIssuer());
             tokenInfo.addParameter(KeycloakConstants.ACCESS_TOKEN_IDENTIFIER, introspectInfo.getJti());
         }
