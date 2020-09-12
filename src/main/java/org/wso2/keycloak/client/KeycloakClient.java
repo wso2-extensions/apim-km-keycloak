@@ -125,12 +125,14 @@ public class KeycloakClient extends AbstractKeyManager {
             	 String keycloakId = getKeycloakId(clientName);
                 String clientSecret = getClientSecret(keycloakId);
                 JSONObject clientInfoJsonObject = getClientById(clientName);
-                oAuthApplicationInfo = createOAuthAppInfoFromResponse(clientInfoJsonObject);
-                oAuthApplicationInfo.addParameter(KeycloakConstants.TOKEN_SCOPE, scope);
-                oAuthApplicationInfo.addParameter(KeycloakConstants.TOKEN_GRANT_TYPE, tokenGrantType);
-                oAuthApplicationInfo.addParameter(KeycloakConstants.CLIENT_SECRET, clientSecret);
-                oAuthApplicationInfo.setClientSecret(clientSecret);
-                return oAuthApplicationInfo;
+                if (clientInfoJsonObject != null) {
+                    oAuthApplicationInfo = createOAuthAppInfoFromResponse(clientInfoJsonObject);
+                    oAuthApplicationInfo.addParameter(KeycloakConstants.TOKEN_SCOPE, scope);
+                    oAuthApplicationInfo.addParameter(KeycloakConstants.TOKEN_GRANT_TYPE, tokenGrantType);
+                    oAuthApplicationInfo.addParameter(KeycloakConstants.CLIENT_SECRET, clientSecret);
+                    oAuthApplicationInfo.setClientSecret(clientSecret);
+                    return oAuthApplicationInfo;
+                }
             } else {
                 handleException(String.format("Error occured while registering the new client in Keycloak. " +
                         "Response : %s", statusCode));
@@ -184,10 +186,12 @@ public class KeycloakClient extends AbstractKeyManager {
             if (statusCode == HttpStatus.SC_NO_CONTENT){
                 String clientSecret = getClientSecret(keycloakId);
                 JSONObject clientInfoJsonObject = getClientById(clientId);
-                oAuthApplicationInfo = createOAuthAppInfoFromResponse(clientInfoJsonObject);
-                oAuthApplicationInfo.addParameter(KeycloakConstants.CLIENT_SECRET, clientSecret);
-                oAuthApplicationInfo.setClientSecret(clientSecret);
-                return oAuthApplicationInfo;
+                if (clientInfoJsonObject != null) {
+                    oAuthApplicationInfo = createOAuthAppInfoFromResponse(clientInfoJsonObject);
+                    oAuthApplicationInfo.addParameter(KeycloakConstants.CLIENT_SECRET, clientSecret);
+                    oAuthApplicationInfo.setClientSecret(clientSecret);
+                    return oAuthApplicationInfo;
+                }
             } else {
                 handleException(String.format("Error occured when updating the Client with Consumer Key %s" +
                         " : Response: %s", clientId, statusCode));
@@ -242,9 +246,12 @@ public class KeycloakClient extends AbstractKeyManager {
         String keycloakId = getKeycloakId(clientId);
         String clientSecret = getClientSecret(keycloakId);
         JSONObject clientInfoJsonObject = getClientById(clientId);
-        oAuthApplicationInfo = createOAuthAppInfoFromResponse(clientInfoJsonObject);
-        oAuthApplicationInfo.setClientSecret(clientSecret);
-        return oAuthApplicationInfo;
+        if (clientInfoJsonObject != null) {
+            oAuthApplicationInfo = createOAuthAppInfoFromResponse(clientInfoJsonObject);
+            oAuthApplicationInfo.setClientSecret(clientSecret);
+            return oAuthApplicationInfo;
+        }
+        return null;
     }
 
     @Override
