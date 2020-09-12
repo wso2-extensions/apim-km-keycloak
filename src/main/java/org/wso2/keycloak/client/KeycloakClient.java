@@ -342,7 +342,7 @@ public class KeycloakClient extends AbstractKeyManager {
                 }
 
                 try (BufferedReader reader = new BufferedReader(
-                            new InputStreamReader(entity.getContent(), StandardCharsets.UTF_8));) {
+                        new InputStreamReader(entity.getContent(), StandardCharsets.UTF_8));) {
                     responseJSON = getParsedObjectByReader(reader);
                 }
                 if (responseJSON == null) {
@@ -528,14 +528,14 @@ public class KeycloakClient extends AbstractKeyManager {
         OAuthApplicationInfo result = new OAuthApplicationInfo();
         result.setClientId((String) responseMap.get(KeycloakConstants.KEYCLOAK_CLIENT_ID));
         result.setClientName((String) responseMap.get(KeycloakConstants.KEYCLOAK_CLIENT_ID));
-        
+
         ArrayList<String> uris = new ArrayList<>();
         Iterator i = ((JSONArray) responseMap.get(KeycloakConstants.CLIENT_REDIRECT_URIS)).iterator();
-        
+
         while (i.hasNext()) {
             uris.add((String) i.next());
         }
-        
+
         String joinedUris = StringUtils.join(uris, ",");
         String escapedUris = escapeHtml(joinedUris);
         result.setCallBackURL(joinedUris);
@@ -595,13 +595,13 @@ public class KeycloakClient extends AbstractKeyManager {
         Object clientGrantTypes = oAuthApplicationInfo.getParameter(KeycloakConstants.CLIENT_GRANT_TYPES);
         if (clientGrantTypes != null) {
             List<String> grantTypes = Arrays.asList(((String) clientGrantTypes).split(","));
-            paramMap.put(KeycloakConstants.GRANT_TYPE_CLIENT_CREDENTIALS_KEYCLOAK, 
+            paramMap.put(KeycloakConstants.GRANT_TYPE_CLIENT_CREDENTIALS_KEYCLOAK,
                     grantTypes.contains(KeycloakConstants.GRANT_TYPE_CLIENT_CREDENTIALS));
-            paramMap.put(KeycloakConstants.GRANT_TYPE_AUTHORIZATION_CODE_KEYCLOAK, 
+            paramMap.put(KeycloakConstants.GRANT_TYPE_AUTHORIZATION_CODE_KEYCLOAK,
                     grantTypes.contains(KeycloakConstants.GRANT_TYPE_AUTHORIZATION_CODE));
-            paramMap.put(KeycloakConstants.GRANT_TYPE_IMPLICIT_KEYCLOAK, 
+            paramMap.put(KeycloakConstants.GRANT_TYPE_IMPLICIT_KEYCLOAK,
                     grantTypes.contains(KeycloakConstants.GRANT_TYPE_IMPLICIT));
-            paramMap.put(KeycloakConstants.GRANT_TYPE_PASSWORD_KEYCLOAK, 
+            paramMap.put(KeycloakConstants.GRANT_TYPE_PASSWORD_KEYCLOAK,
                     grantTypes.contains(KeycloakConstants.GRANT_TYPE_PASSWORD));
         }
         return JSONObject.toJSONString(paramMap);
@@ -920,7 +920,7 @@ public class KeycloakClient extends AbstractKeyManager {
             throws APIManagementException {
         OAuthApplicationInfo oAuthApplicationInfo = oAuthAppRequest.getOAuthApplicationInfo();
         String clientId = oAuthApplicationInfo.getClientId();
-        
+
         if (log.isDebugEnabled()) {
             log.debug(String.format("Updating application owner for the Consumer Key: %s", clientId));
         }
