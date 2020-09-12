@@ -51,6 +51,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import static org.apache.commons.lang.StringEscapeUtils.escapeHtml;
@@ -333,7 +334,8 @@ public class KeycloakClient extends AbstractKeyManager {
                             KeycloakConstants.ERROR_COULD_NOT_READ_HTTP_ENTITY, response));
                 }
 
-                try (BufferedReader reader = new BufferedReader(new InputStreamReader(entity.getContent(), KeycloakConstants.UTF_8));) {
+                try (BufferedReader reader = new BufferedReader(
+                            new InputStreamReader(entity.getContent(), StandardCharsets.UTF_8));) {
                     responseJSON = getParsedObjectByReader(reader);
                 }
                 if (responseJSON == null) {
@@ -701,7 +703,7 @@ public class KeycloakClient extends AbstractKeyManager {
             int statusCode = response.getStatusLine().getStatusCode();
             if (HttpStatus.SC_OK == statusCode) {
                 HttpEntity entity = response.getEntity();
-                try (BufferedReader reader = new BufferedReader(new InputStreamReader(entity.getContent(), KeycloakConstants.UTF_8));) {
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(entity.getContent(), StandardCharsets.UTF_8));) {
                     JSONObject responseJSON = getParsedObjectByReader(reader);
                     keycloakTokenInfo = new KeycloakTokenInfo((String) responseJSON.get(KeycloakConstants.ACCESS_TOKEN),
                             (String) responseJSON.get(KeycloakConstants.REFRESH_TOKEN),
@@ -748,7 +750,7 @@ public class KeycloakClient extends AbstractKeyManager {
             int statusCode = response.getStatusLine().getStatusCode();
             if (HttpStatus.SC_OK == statusCode) {
                 HttpEntity entity = response.getEntity();
-                try (BufferedReader reader = new BufferedReader(new InputStreamReader(entity.getContent(), KeycloakConstants.UTF_8));) {
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(entity.getContent(), StandardCharsets.UTF_8));) {
                     JSONObject responseJSON = getParsedObjectByReader(reader);
                     return responseJSON;
                 }
@@ -787,7 +789,7 @@ public class KeycloakClient extends AbstractKeyManager {
             int statusCode = response.getStatusLine().getStatusCode();
             if (HttpStatus.SC_OK == statusCode) {
                 HttpEntity entity = response.getEntity();
-                try (BufferedReader reader = new BufferedReader(new InputStreamReader(entity.getContent(), KeycloakConstants.UTF_8));) {
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(entity.getContent(), StandardCharsets.UTF_8));) {
                     JSONObject responseJSON = getParsedObjectByReader(reader);
                     return (String) responseJSON.get(KeycloakConstants.CLIENT_SECRET_VALUE);
                 }
@@ -823,7 +825,7 @@ public class KeycloakClient extends AbstractKeyManager {
             int statusCode = response.getStatusLine().getStatusCode();
             if (HttpStatus.SC_OK == statusCode) {
                 HttpEntity entity = response.getEntity();
-                try (BufferedReader reader = new BufferedReader(new InputStreamReader(entity.getContent(), KeycloakConstants.UTF_8));) {
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(entity.getContent(), StandardCharsets.UTF_8));) {
                     JSONObject responseJSON = getParsedObjectByReader(reader);
                     return (String)responseJSON.get(KeycloakConstants.KEYCLOAK_ID);
                 }
@@ -859,7 +861,7 @@ public class KeycloakClient extends AbstractKeyManager {
             int statusCode = response.getStatusLine().getStatusCode();
             if (HttpStatus.SC_OK == statusCode) {
                 HttpEntity entity = response.getEntity();
-                try (BufferedReader reader = new BufferedReader(new InputStreamReader(entity.getContent(), KeycloakConstants.UTF_8));) {
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(entity.getContent(), StandardCharsets.UTF_8));) {
                     JSONObject responseJSON = getParsedObjectByReader(reader);
                     return responseJSON;
                 }
