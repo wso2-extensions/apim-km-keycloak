@@ -536,16 +536,16 @@ public class KeycloakClient extends AbstractKeyManager {
         result.setIsSaasApplication(false);
         ArrayList<String> grantTypeList = new ArrayList<>();
 
-        if ((Boolean) responseMap.get(KeycloakConstants.GRANT_TYPE_IMPLICIT_KEYCLOAK)) {
+        if (Boolean.TRUE.equals(responseMap.get(KeycloakConstants.GRANT_TYPE_IMPLICIT_KEYCLOAK))) {
             grantTypeList.add(KeycloakConstants.GRANT_TYPE_IMPLICIT);
         }
-        if ((Boolean) responseMap.get(KeycloakConstants.GRANT_TYPE_AUTHORIZATION_CODE_KEYCLOAK)) {
+        if (Boolean.TRUE.equals(responseMap.get(KeycloakConstants.GRANT_TYPE_AUTHORIZATION_CODE_KEYCLOAK))) {
             grantTypeList.add(KeycloakConstants.GRANT_TYPE_AUTHORIZATION_CODE);
         }
-        if ((Boolean) responseMap.get(KeycloakConstants.GRANT_TYPE_CLIENT_CREDENTIALS_KEYCLOAK)) {
+        if (Boolean.TRUE.equals(responseMap.get(KeycloakConstants.GRANT_TYPE_CLIENT_CREDENTIALS_KEYCLOAK))) {
             grantTypeList.add(KeycloakConstants.GRANT_TYPE_CLIENT_CREDENTIALS);
         }
-        if ((Boolean) responseMap.get(KeycloakConstants.GRANT_TYPE_PASSWORD_KEYCLOAK)) {
+        if (Boolean.TRUE.equals(responseMap.get(KeycloakConstants.GRANT_TYPE_PASSWORD_KEYCLOAK))) {
             grantTypeList.add(KeycloakConstants.GRANT_TYPE_PASSWORD);
         }
 
@@ -588,26 +588,14 @@ public class KeycloakClient extends AbstractKeyManager {
         Object clientGrantTypes = oAuthApplicationInfo.getParameter(KeycloakConstants.CLIENT_GRANT_TYPES);
         if (clientGrantTypes != null) {
             List<String> grantTypes = Arrays.asList(((String) clientGrantTypes).split(","));
-            if (grantTypes.contains(KeycloakConstants.GRANT_TYPE_CLIENT_CREDENTIALS)) {
-                paramMap.put(KeycloakConstants.GRANT_TYPE_CLIENT_CREDENTIALS_KEYCLOAK, true);
-            } else {
-                paramMap.put(KeycloakConstants.GRANT_TYPE_CLIENT_CREDENTIALS_KEYCLOAK, false);
-            }
-            if (grantTypes.contains(KeycloakConstants.GRANT_TYPE_AUTHORIZATION_CODE)) {
-                paramMap.put(KeycloakConstants.GRANT_TYPE_AUTHORIZATION_CODE_KEYCLOAK, true);
-            } else {
-                paramMap.put(KeycloakConstants.GRANT_TYPE_AUTHORIZATION_CODE_KEYCLOAK, false);
-            }
-            if (grantTypes.contains(KeycloakConstants.GRANT_TYPE_IMPLICIT)) {
-                paramMap.put(KeycloakConstants.GRANT_TYPE_IMPLICIT_KEYCLOAK, true);
-            } else {
-                paramMap.put(KeycloakConstants.GRANT_TYPE_IMPLICIT_KEYCLOAK, false);
-            }
-            if (grantTypes.contains(KeycloakConstants.GRANT_TYPE_PASSWORD)) {
-                paramMap.put(KeycloakConstants.GRANT_TYPE_PASSWORD_KEYCLOAK, true);
-            } else {
-                paramMap.put(KeycloakConstants.GRANT_TYPE_PASSWORD_KEYCLOAK, false);
-            }
+            paramMap.put(KeycloakConstants.GRANT_TYPE_CLIENT_CREDENTIALS_KEYCLOAK, 
+                    grantTypes.contains(KeycloakConstants.GRANT_TYPE_CLIENT_CREDENTIALS));
+            paramMap.put(KeycloakConstants.GRANT_TYPE_AUTHORIZATION_CODE_KEYCLOAK, 
+                    grantTypes.contains(KeycloakConstants.GRANT_TYPE_AUTHORIZATION_CODE));
+            paramMap.put(KeycloakConstants.GRANT_TYPE_IMPLICIT_KEYCLOAK, 
+                    grantTypes.contains(KeycloakConstants.GRANT_TYPE_IMPLICIT));
+            paramMap.put(KeycloakConstants.GRANT_TYPE_PASSWORD_KEYCLOAK, 
+                    grantTypes.contains(KeycloakConstants.GRANT_TYPE_PASSWORD));
         }
         return JSONObject.toJSONString(paramMap);
     }
@@ -751,8 +739,7 @@ public class KeycloakClient extends AbstractKeyManager {
             if (HttpStatus.SC_OK == statusCode) {
                 HttpEntity entity = response.getEntity();
                 try (BufferedReader reader = new BufferedReader(new InputStreamReader(entity.getContent(), StandardCharsets.UTF_8));) {
-                    JSONObject responseJSON = getParsedObjectByReader(reader);
-                    return responseJSON;
+                    return getParsedObjectByReader(reader);
                 }
             }else{
                 handleException("Error occurred while generating access token");
@@ -862,8 +849,7 @@ public class KeycloakClient extends AbstractKeyManager {
             if (HttpStatus.SC_OK == statusCode) {
                 HttpEntity entity = response.getEntity();
                 try (BufferedReader reader = new BufferedReader(new InputStreamReader(entity.getContent(), StandardCharsets.UTF_8));) {
-                    JSONObject responseJSON = getParsedObjectByReader(reader);
-                    return responseJSON;
+                    return getParsedObjectByReader(reader);
                 }
             }
         } catch (ParseException e) {
