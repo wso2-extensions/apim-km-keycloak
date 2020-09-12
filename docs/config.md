@@ -131,11 +131,46 @@ You have connected WSO2 API Manager with a third-party Keycloak IAM server. Let'
 
 5. **Validate tokens by subscribing to the Keycloak client :**
 
+    > If the requirement is to generate JWT tokens with scopes and invoke the APIs, please refer to [Access Token Generation with Scopes](#access-token-generation-with-scopes) to configure and generate JWT tokens with Scopes
+
     1. Sign in to the API Publisher and deploy the sample API (PizzaShackAPI)
 
     2. Assuming you still have the Keycloak client created earlier and subscribe to the deployed API using the created application
 
     3. Copy the Access Token that generated in the previous step and paste it in the API Console UI and invoke the API
+
+### Access Token Generation with Scopes
+
+If you have published an API with Scope validation, then please follow the instructions to configure the Keycloak to generate JWT tokens with the required scopes.
+
+#### Pre-requisites
+
+Attached is a screenshot of the sample `Pizzashack API` resource configured with a scope named `menu`
+
+![API Resource mapped with Scope](images/menu-scope-resource.png)
+
+#### Configuring Keycloak Client
+
+1. Login to the Keycloak's Admin console > select the respective Realm > and click on `Client Scopes` section.
+
+    ![Client Scopes](images/keycloak-client-scopes.png)
+
+2. Click on `Create` and enter the required details to create a client scope in the Keycloak server.
+
+    ![Create Scope](images/add-client-scope.png)
+
+3. Once done, go to the respective created Keycloak client (e.g. `admin_KeycloakApplication_PRODUCTION`) and go to the `Client Scopes` tab and select the created scope and press `Add selected` to engage the created scope with the client
+
+    ![Assign Client Scope](images/assign-client-scope.png)
+
+#### Generate Token from Devportal
+
+1. Login to the Devportal and navigate to the created `Application` > `Production Keys` > `OAuth2 Tokens` screen
+2. Click on `Generate Access Token` and select the scope in the displayed modal and click on `Generate` to generate the JWT token with the required scopes
+
+    ![Generate JWT with Scope](images/generate-token-with-scope.png)
+
+3. Copy and paste the Token in the Try-out console and invoke the API
 
 ## Build & Deploy
 
