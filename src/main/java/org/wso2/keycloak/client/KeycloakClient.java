@@ -18,10 +18,7 @@
 
 package org.wso2.keycloak.client;
 
-import com.nimbusds.jose.JWSHeader;
-import com.nimbusds.jose.Payload;
 import com.nimbusds.jwt.*;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -41,7 +38,6 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.wso2.carbon.apimgt.api.APIManagementException;
@@ -49,7 +45,6 @@ import org.wso2.carbon.apimgt.api.model.*;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.AbstractKeyManager;
 import org.wso2.carbon.apimgt.impl.dao.ApiMgtDAO;
-import org.wso2.carbon.apimgt.impl.factory.KeyManagerHolder;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import java.io.BufferedReader;
@@ -103,7 +98,7 @@ public class KeycloakClient extends AbstractKeyManager {
                 KeycloakConstants.CLIENT_ENDPOINT;
         String[] scope = ((String) oAuthApplicationInfo.getParameter(KeycloakConstants.TOKEN_SCOPE)).split(",");
         Object tokenGrantType = oAuthApplicationInfo.getParameter(KeycloakConstants.TOKEN_GRANT_TYPE);
-        Map<String, Object> paramMap = new HashMap<String, Object>();
+        Map<String, Object> paramMap = new HashMap<>();
         try (CloseableHttpClient httpClient = HttpClientBuilder.create().build();) {
             // Create the JSON Payload that should be sent to OAuth Server.
             String jsonPayload = createJsonPayloadFromOauthApplication(oAuthApplicationInfo, paramMap);
@@ -164,7 +159,7 @@ public class KeycloakClient extends AbstractKeyManager {
         String registrationEndpoint = keyCloakInstanceUrl + KeycloakConstants.KEYCLOAK_ADMIN_CONTEXT + keycloakRealm +
                 KeycloakConstants.CLIENT_ENDPOINT + keycloakId;
 
-        Map<String, Object> paramMap = new HashMap<String, Object>();
+        Map<String, Object> paramMap = new HashMap<>();
         if (StringUtils.isNotEmpty(clientId)) {
             paramMap.put(KeycloakConstants.KEYCLOAK_CLIENT_ID, clientId);
         }
@@ -260,7 +255,7 @@ public class KeycloakClient extends AbstractKeyManager {
             log.debug(String.format("Get new client access token from authorization server for the Consumer Key %s",
                     clientId));
         }
-        List<NameValuePair> parameters = new ArrayList<NameValuePair>();
+        List<NameValuePair> parameters = new ArrayList<>();
         Object grantType = accessTokenRequest.getGrantType();
         if (grantType == null) {
             grantType = KeycloakConstants.GRANT_TYPE_CLIENT_CREDENTIALS;
@@ -298,6 +293,7 @@ public class KeycloakClient extends AbstractKeyManager {
             log.debug(String.format("Getting access token metadata from authorization server. Access token %s",
                     accessToken));
         }
+
         String clientId = null;
         try {
             SignedJWT parsedJWTToken = (SignedJWT) JWTParser.parse(accessToken);
@@ -306,20 +302,24 @@ public class KeycloakClient extends AbstractKeyManager {
             if (log.isDebugEnabled()) {
                 log.debug("Invalid JWT token. Token: " + accessToken);
             }
+
             handleException("Invalid JWT token. Failed to decode the token.");
         }
+
         String keycloakId = getKeycloakId(clientId);
         String clientSecret = getClientSecret(keycloakId);
         AccessTokenInfo tokenInfo = new AccessTokenInfo();
         String keyCloakInstanceUrl = configuration.getParameter(KeycloakConstants.KEYCLOAK_INSTANCE_URL);
         String keycloakRealm = configuration.getParameter(KeycloakConstants.KEYCLOAK_REALM_NAME);
-        String introspectEndpoint = keyCloakInstanceUrl + KeycloakConstants.KEYCLOAK_TOKEN_CONTEXT + keycloakRealm +
-                KeycloakConstants.KEYCLOAK_INTROSPECT_PATH;
+        String introspectEndpoint = keyCloakInstanceUrl + KeycloakConstants.KEYCLOAK_TOKEN_CONTEXT + keycloakRealm
+                + KeycloakConstants.KEYCLOAK_INTROSPECT_PATH;
+
         try (CloseableHttpClient httpClient = HttpClientBuilder.create().build();) {
-            List<NameValuePair> parameters = new ArrayList<NameValuePair>();
+            List<NameValuePair> parameters = new ArrayList<>();
             parameters.add(new BasicNameValuePair(KeycloakConstants.TOKEN, accessToken));
             parameters.add(new BasicNameValuePair(KeycloakConstants.CLIENT_ID, clientId));
             parameters.add(new BasicNameValuePair(KeycloakConstants.CLIENT_SECRET, clientSecret));
+
             HttpPost httpPost = new HttpPost(introspectEndpoint);
             httpPost.setEntity(new UrlEncodedFormEntity(parameters));
             HttpResponse response = httpClient.execute(httpPost);
@@ -357,8 +357,8 @@ public class KeycloakClient extends AbstractKeyManager {
 
                     tokenInfo.setIssuedTime(issuedTime);
                     tokenInfo.setConsumerKey((String) responseJSON.get(KeycloakConstants.CLIENT_ID));
-                    tokenInfo.setEndUserName(responseJSON.get(KeycloakConstants.ACCESS_TOKEN_USER_NAME)+"@"+
-                            MultitenantConstants.SUPER_TENANT_DOMAIN_NAME);
+                    tokenInfo.setEndUserName(responseJSON.get(KeycloakConstants.ACCESS_TOKEN_USER_NAME) + "@"
+                            + MultitenantConstants.SUPER_TENANT_DOMAIN_NAME);
                     tokenInfo.addParameter(KeycloakConstants.ACCESS_TOKEN_SUBJECT,
                             responseJSON.get(KeycloakConstants.ACCESS_TOKEN_SUBJECT));
                     tokenInfo.addParameter(KeycloakConstants.ACCESS_TOKEN_AUDIENCE,
@@ -472,16 +472,19 @@ public class KeycloakClient extends AbstractKeyManager {
     }
 
     @Override
+    @SuppressWarnings("rawtypes")
     public boolean registerNewResource(API api, Map map) throws APIManagementException {
         return true;
     }
 
     @Override
+    @SuppressWarnings("rawtypes")
     public Map getResourceByApiId(String s) throws APIManagementException {
         return null;
     }
 
     @Override
+    @SuppressWarnings("rawtypes")
     public boolean updateRegisteredResource(API api, Map map) throws APIManagementException {
         return true;
     }
@@ -514,17 +517,20 @@ public class KeycloakClient extends AbstractKeyManager {
      */
     private OAuthApplicationInfo createOAuthAppInfoFromResponse(JSONObject responseMap) {
         OAuthApplicationInfo result = new OAuthApplicationInfo();
-        result.setClientId((String)responseMap.get(KeycloakConstants.KEYCLOAK_CLIENT_ID));
-        result.setClientName((String)responseMap.get(KeycloakConstants.KEYCLOAK_CLIENT_ID));
+        result.setClientId((String) responseMap.get(KeycloakConstants.KEYCLOAK_CLIENT_ID));
+        result.setClientName((String) responseMap.get(KeycloakConstants.KEYCLOAK_CLIENT_ID));
+        
         ArrayList<String> uris = new ArrayList<>();
-        Iterator i = ((JSONArray)responseMap.get(KeycloakConstants.CLIENT_REDIRECT_URIS)).iterator();
-        while(i.hasNext()){
-            uris.add((String)i.next());
+        Iterator i = ((JSONArray) responseMap.get(KeycloakConstants.CLIENT_REDIRECT_URIS)).iterator();
+        
+        while (i.hasNext()) {
+            uris.add((String) i.next());
         }
+        
         String joinedUris = StringUtils.join(uris, ",");
         String escapedUris = escapeHtml(joinedUris);
         result.setCallBackURL(joinedUris);
-        result.setClientSecret((String)responseMap.get(KeycloakConstants.CLIENT_SECRET));
+        result.setClientSecret((String) responseMap.get(KeycloakConstants.CLIENT_SECRET));
         result.setIsSaasApplication(false);
         ArrayList<String> grantTypeList = new ArrayList<>();
 
@@ -560,7 +566,7 @@ public class KeycloakClient extends AbstractKeyManager {
      * @throws APIManagementException This is the custom exception class for API management.
      */
     private String createJsonPayloadFromOauthApplication(OAuthApplicationInfo oAuthApplicationInfo,
-                                                         Map<String, Object> paramMap) throws APIManagementException {
+                                                         Map<String, Object> paramMap) {
         String clientId = oAuthApplicationInfo.getClientId();
         if (log.isDebugEnabled()) {
             log.debug(String.format("Creating json payload from Oauth application info for the application: %s",
@@ -569,7 +575,6 @@ public class KeycloakClient extends AbstractKeyManager {
 
         if (StringUtils.isNotEmpty(clientId)) {
             paramMap.put(KeycloakConstants.KEYCLOAK_CLIENT_ID, clientId);
-            //paramMap.put(KeycloakConstants.KEYCLOAK_ID, clientId);
         }
 
         String clientRedirectUri = oAuthApplicationInfo.getCallBackURL();
@@ -643,30 +648,9 @@ public class KeycloakClient extends AbstractKeyManager {
         	} else {
         		parsedObject = (JSONObject)object;
         	}
-           
         }
         return parsedObject;
     }
-
-    /**
-     * Returns base64 encoded credentaials.
-     *
-     * @param clientId     clientId of the oauth client.
-     * @param clientSecret clientSecret of the oauth clients.
-     * @return String base64 encode string.
-     */
-    private static String getEncodedCredentials(String clientId, String clientSecret) throws APIManagementException {
-        String encodedCredentials;
-        try {
-            encodedCredentials = Base64.getEncoder().encodeToString((clientId + ":" + clientSecret)
-                    .getBytes(KeycloakConstants.UTF_8));
-        } catch (UnsupportedEncodingException e) {
-            throw new APIManagementException(KeycloakConstants.ERROR_ENCODING_METHOD_NOT_SUPPORTED, e);
-        }
-
-        return encodedCredentials;
-    }
-
 
     /**
      * Common method to throw exceptions. This will only expect one parameter.
@@ -692,16 +676,16 @@ public class KeycloakClient extends AbstractKeyManager {
         String keycloakInstanceUrl = configuration.getParameter(KeycloakConstants.KEYCLOAK_INSTANCE_URL);
         String username = configuration.getParameter(KeycloakConstants.USERNAME);
         String password = configuration.getParameter(KeycloakConstants.PASSWORD);
-        String client_id = configuration.getParameter(KeycloakConstants.CLIENT_ID);
+        String clientId = configuration.getParameter(KeycloakConstants.CLIENT_ID);
         String keycloakRealm = configuration.getParameter(KeycloakConstants.KEYCLOAK_REALM_NAME);
         String keyCloakTokenEndpoint = keycloakInstanceUrl + KeycloakConstants.KEYCLOAK_TOKEN_CONTEXT + keycloakRealm +
                 KeycloakConstants.KEYCLOAK_TOKEN_PATH;
 
         try (CloseableHttpClient httpClient = HttpClientBuilder.create().build();) {
-            List<NameValuePair> parameters = new ArrayList<NameValuePair>();
+            List<NameValuePair> parameters = new ArrayList<>();
             parameters.add(new BasicNameValuePair(KeycloakConstants.USERNAME, username));
             parameters.add(new BasicNameValuePair(KeycloakConstants.PASSWORD, password));
-            parameters.add(new BasicNameValuePair(KeycloakConstants.CLIENT_ID, client_id));
+            parameters.add(new BasicNameValuePair(KeycloakConstants.CLIENT_ID, clientId));
             if(keycloakTokenInfo != null && keycloakTokenInfo.isRefreshValid()){
                 parameters.add(new BasicNameValuePair(KeycloakConstants.GRANT_TYPE,
                         KeycloakConstants.GRANT_TYPE_REFRESH_TOKEN));
@@ -936,10 +920,12 @@ public class KeycloakClient extends AbstractKeyManager {
      * @throws APIManagementException This is the custom exception class for API
      *                                management
      */
+    @Override
     public OAuthApplicationInfo updateApplicationOwner(OAuthAppRequest oAuthAppRequest, String owner)
             throws APIManagementException {
         OAuthApplicationInfo oAuthApplicationInfo = oAuthAppRequest.getOAuthApplicationInfo();
         String clientId = oAuthApplicationInfo.getClientId();
+        
         if (log.isDebugEnabled()) {
             log.debug(String.format("Updating application owner for the Consumer Key: %s", clientId));
         }
