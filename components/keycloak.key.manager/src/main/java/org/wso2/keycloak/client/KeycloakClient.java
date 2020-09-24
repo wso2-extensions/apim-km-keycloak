@@ -327,8 +327,17 @@ public class KeycloakClient extends AbstractKeyManager {
      */
     @Override
     public OAuthApplicationInfo mapOAuthApplication(OAuthAppRequest oAuthAppRequest) throws APIManagementException {
+        String consumerKey = oAuthAppRequest.getOAuthApplicationInfo().getClientId();
+        String consumerSecret = oAuthAppRequest.getOAuthApplicationInfo().getClientSecret();
 
-        return oAuthAppRequest.getOAuthApplicationInfo();
+        if (StringUtils.isNotBlank(consumerKey) && StringUtils.isNotBlank(consumerSecret)) {
+            OAuthApplicationInfo clientInfo = retrieveApplication(consumerKey);
+            if (clientInfo != null && consumerSecret.equals(clientInfo.getClientSecret())) {
+                return oAuthAppRequest.getOAuthApplicationInfo();
+            }
+        }
+
+        throw new APIManagementException("Invalid credentials");
     }
 
     @Override
