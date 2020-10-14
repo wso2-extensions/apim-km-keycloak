@@ -467,6 +467,7 @@ public class KeycloakClient extends AbstractKeyManager {
         appInfo.setClientName(clientInfo.getClientName());
         appInfo.setClientId(clientInfo.getClientId());
         appInfo.setClientSecret(clientInfo.getClientSecret());
+        appInfo.addParameter(ApplicationConstants.OAUTH_CLIENT_NAME, clientInfo.getClientName());
         if (clientInfo.getCallBackUrls() != null) {
             appInfo.setCallBackURL(String.join(",", clientInfo.getCallBackUrls()));
         }
@@ -594,19 +595,7 @@ public class KeycloakClient extends AbstractKeyManager {
     public OAuthApplicationInfo updateApplicationOwner(OAuthAppRequest oAuthAppRequest, String owner)
             throws APIManagementException {
 
-        OAuthApplicationInfo oAuthApplicationInfo = oAuthAppRequest.getOAuthApplicationInfo();
-        String clientId = oAuthApplicationInfo.getClientId();
-        if (log.isDebugEnabled()) {
-            log.debug(String.format("Updating application owner for the Consumer Key: %s", clientId));
-        }
-
-        try {
-            return updateApplication(oAuthAppRequest);
-        } catch (Exception e) {
-            handleException("Error occurred while updating OAuth application owner to " + owner, e);
-        }
-
-        return null;
+        return oAuthAppRequest.getOAuthApplicationInfo();
     }
 
     /**
