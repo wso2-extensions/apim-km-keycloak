@@ -1,10 +1,12 @@
 # Integrate Keycloak as a Third Party Key Manager for WSO2 API Manager
 
-This Keycloak key manager implementation allows you to integrate the WSO2 API Store with an external Keycloak Identity and Access Management server (IAM) by using the Keycloak OAuth to manage the OAuth clients and tokens required by WSO2 API Manager. We have a sample client implementation that consumes the admin REST APIs exposed by keycloak.
+This Keycloak key manager implementation allows you to integrate the WSO2 API Devportal with an external Keycloak Identity and Access Management server (IAM) by using the Keycloak OAuth to manage the OAuth clients and tokens required by WSO2 API Manager. This repo contains a sample implementation and extension to integrate Keycloak with WSO2 API Manager server.
+
+> The presented implementation supports WSO2 API Manager v3.1.0
 
 ## Getting Started
 
-To get started, go to [Integrate WSO2 API Store with an external IAM using the Keycloak Open Source IAM](docs/config.md).
+To get started, please refer to [Integrate Keycloak with WSO2 API Manager Devportal](docs/config.md).
 
 ## Build
 
