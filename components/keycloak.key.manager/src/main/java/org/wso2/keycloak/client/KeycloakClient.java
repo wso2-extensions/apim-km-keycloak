@@ -330,14 +330,14 @@ public class KeycloakClient extends AbstractKeyManager {
         String consumerKey = oAuthAppRequest.getOAuthApplicationInfo().getClientId();
         String consumerSecret = oAuthAppRequest.getOAuthApplicationInfo().getClientSecret();
 
-        if (StringUtils.isNotBlank(consumerKey) && StringUtils.isNotBlank(consumerSecret)) {
+        if (StringUtils.isNotBlank(consumerKey)) {
             OAuthApplicationInfo clientInfo = retrieveApplication(consumerKey);
             if (clientInfo == null) {
                 handleException(
                         "Something went wrong while getting OAuth application for given consumer key " + consumerKey);
             }
-            
-            if (!consumerSecret.equals(clientInfo.getClientSecret())) {
+
+            if (StringUtils.isNotBlank(consumerSecret) && !consumerSecret.equals(clientInfo.getClientSecret())) {
                 throw new APIManagementException("The secret key is wrong for the given consumer key " + consumerKey);
             }
 
