@@ -57,7 +57,7 @@ public class KeyCloakConnectorConfiguration implements KeyManagerConnectorConfig
                         "code token", "code id_token token"), true));
         configurationDtoList
                 .add(new ConfigurationDto("subject_type", "Subject Type", "select", "Subject Type of Client", 
-                        "pairwise", true, false, Arrays.asList("public", "pairwise"), false));
+                        "public", true, false, Arrays.asList("public", "pairwise"), false));
         configurationDtoList
                 .add(new ConfigurationDto("token_endpoint_auth_method", "Token endpoint Authentication Method",
                         "select", "How to Authenticate Token Endpoint", "client_secret_basic", true,
