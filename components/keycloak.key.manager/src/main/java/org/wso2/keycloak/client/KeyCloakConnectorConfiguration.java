@@ -52,7 +52,7 @@ public class KeyCloakConnectorConfiguration implements KeyManagerConnectorConfig
         List<ConfigurationDto> configurationDtoList = new ArrayList<>();
         configurationDtoList
                 .add(new ConfigurationDto("response_types", "Response Type", "select",
-                        "Type Of Token response", "token", false, false,
+                        "Type Of Token response", Arrays.asList("token"), false, false,
                         Arrays.asList("code", "none", "id_token", "token", "id_token token", "code id_token",
                         "code token", "code id_token token"), true));
         configurationDtoList
