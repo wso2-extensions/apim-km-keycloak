@@ -599,19 +599,20 @@ public class KeycloakClient extends AbstractKeyManager {
     }
 
     /**
-     * This method can be used to create a JSON Payload out of the Parameters defined in an OAuth Application
+     * This method can be used to create a JSON Payload out of the Parameters
+     * defined in an OAuth Application
      * in order to create and update the client.
      *
      * @param oAuthApplicationInfo Object that needs to be converted.
      * @return JSON payload.
-     * @throws APIManagementException This is the custom exception class for API management.
+     * @throws APIManagementException This is the custom exception class for API
+     *                                management.
      */
     private ClientInfo createClientInfoFromOauthApplicationInfo(OAuthApplicationInfo oAuthApplicationInfo)
             throws APIManagementException {
 
         ClientInfo clientInfo = new ClientInfo();
-        String userId = (String) oAuthApplicationInfo.getParameter(ApplicationConstants.
-                OAUTH_CLIENT_USERNAME);
+        String userId = (String) oAuthApplicationInfo.getParameter(ApplicationConstants.OAUTH_CLIENT_USERNAME);
         String userNameForSp = MultitenantUtils.getTenantAwareUsername(userId);
         String domain = UserCoreUtil.extractDomainFromName(userNameForSp);
         if (domain != null && !domain.isEmpty() && !UserCoreConstants.PRIMARY_DEFAULT_DOMAIN_NAME.equals(domain)) {
@@ -626,9 +627,8 @@ public class KeycloakClient extends AbstractKeyManager {
         List<String> grantTypes = new ArrayList<>();
 
         if (oAuthApplicationInfo.getParameter(APIConstants.JSON_GRANT_TYPES) != null) {
-            grantTypes =
-                    Arrays.asList(
-                            ((String) oAuthApplicationInfo.getParameter(APIConstants.JSON_GRANT_TYPES)).split(","));
+            grantTypes = Arrays.asList(
+                    ((String) oAuthApplicationInfo.getParameter(APIConstants.JSON_GRANT_TYPES)).split(","));
         }
         Object parameter = oAuthApplicationInfo.getParameter(APIConstants.JSON_ADDITIONAL_PROPERTIES);
         Map<String, Object> additionalProperties = new HashMap<>();
@@ -663,8 +663,8 @@ public class KeycloakClient extends AbstractKeyManager {
                     (String) additionalProperties.get(KeycloakConstants.CLIENT_TOKEN_ENDPOINT_AUTH_METHOD));
         }
         if (additionalProperties.containsKey(KeycloakConstants.TLS_CLIENT_CERTIFICATE_BOUND_ACCESS_TOKEN)) {
-            Object clientBoundAccessToken =
-                    additionalProperties.get(KeycloakConstants.TLS_CLIENT_CERTIFICATE_BOUND_ACCESS_TOKEN);
+            Object clientBoundAccessToken = additionalProperties
+                    .get(KeycloakConstants.TLS_CLIENT_CERTIFICATE_BOUND_ACCESS_TOKEN);
             if (clientBoundAccessToken instanceof Boolean) {
                 clientInfo.setEnableClientCertificateBindAccessToken((Boolean) clientBoundAccessToken);
             } else if (clientBoundAccessToken instanceof String) {
