@@ -47,7 +47,7 @@ public class KeycloakConstants {
     public static final String CLIENT_TOKEN_ENDPOINT_AUTH_METHOD = "token_endpoint_auth_method";
     public static final String TLS_CLIENT_CERTIFICATE_BOUND_ACCESS_TOKEN = "tls_client_certificate_bound_access_tokens";
     public static final String KEY_CLOAK_TYPE = "KeyCloak";
-    public static final String REQUESTING_PARTY_TOKEN = "requesting_party_token";
+    public static final String INTROSPECTION_TOKEN_TYPE_HINT_ACCESS_TOKEN = "access_token";
 
     KeycloakConstants() {
     }
