@@ -231,13 +231,16 @@ public class KeycloakClient extends AbstractKeyManager {
 
         org.wso2.carbon.apimgt.api.model.AccessTokenInfo tokenInfo =
                 new org.wso2.carbon.apimgt.api.model.AccessTokenInfo();
-        IntrospectInfo introspectInfo =
-                introspectionClient.introspect(accessToken, KeycloakConstants.REQUESTING_PARTY_TOKEN);
+        IntrospectInfo introspectInfo = introspectionClient.introspect(accessToken,
+                KeycloakConstants.INTROSPECTION_TOKEN_TYPE_HINT_ACCESS_TOKEN);
         if (introspectInfo != null) {
             tokenInfo.setAccessToken(accessToken);
             tokenInfo.setTokenValid(introspectInfo.isActive());
-            tokenInfo.setIssuedTime(introspectInfo.getIssuedAt());
-            tokenInfo.setValidityPeriod(introspectInfo.getExpiryTime() - introspectInfo.getIssuedAt());
+            if (introspectInfo.getIssuedAt() > 0 && introspectInfo.getExpiryTime() > 0) {
+                tokenInfo.setIssuedTime(introspectInfo.getIssuedAt() * 1000L);
+                long validityPeriod = introspectInfo.getExpiryTime() - introspectInfo.getIssuedAt();
+                tokenInfo.setValidityPeriod(validityPeriod * 1000L);
+            }
             tokenInfo.setEndUserName(introspectInfo.getUsername());
             tokenInfo.setConsumerKey(introspectInfo.getConsumerKey());
             if (StringUtils.isNotEmpty(introspectInfo.getScope())) {
