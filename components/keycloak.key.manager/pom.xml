@@ -9,6 +9,7 @@
     <modelVersion>4.0.0</modelVersion>
     <packaging>bundle</packaging>
     <artifactId>keycloak.key.manager</artifactId>
+    <name>KeyCloak Key Manager Component</name>
     <dependencies>
         <dependency>
             <groupId>com.googlecode.json-simple</groupId>
